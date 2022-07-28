@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,9 @@ public class UserService {
 
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	TodoService todoService;
 	
 	public User findById(Integer userId) throws NotFoundException{
 		return userRepository.findById(userId)
@@ -46,7 +51,7 @@ public class UserService {
 	
 	private User buildUserFromDto(RegisterUserDto userDto) {
 		User user = new User();
-		user.setName(userDto.getEmail());
+		user.setName(userDto.getName());
 		user.setEmail(userDto.getEmail());
 		user.setPassword(userDto.getPassword());
 		user.setAge(userDto.getAge());
@@ -72,9 +77,11 @@ public class UserService {
 		return user;
 	}
 	
+	@Transactional
 	public User deleteById(Integer userId) throws NotFoundException {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new NotFoundException("Nije pronadjen korisnik: "+userId));
+		todoService.deleteByUser(user);
 		userRepository.deleteById(userId);
 		return user;
 	}

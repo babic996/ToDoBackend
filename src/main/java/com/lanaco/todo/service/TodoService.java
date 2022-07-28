@@ -13,6 +13,7 @@ import com.lanaco.todo.dto.TodoUpdateDto;
 import com.lanaco.todo.model.Todo;
 import com.lanaco.todo.model.User;
 import com.lanaco.todo.repository.TodoRepository;
+import com.lanaco.todo.repository.UserRepository;
 
 import javassist.NotFoundException;
 
@@ -23,11 +24,15 @@ public class TodoService {
 	TodoRepository todoRepository;
 	
 	@Autowired
-	UserService userService;
+	UserRepository userRepository;
 	
 	public Todo findById(Integer todoId) throws NotFoundException{
 		return todoRepository.findById(todoId)
 				.orElseThrow(() -> new NotFoundException("Nije pronadjena obaveza: "+todoId));
+	}
+	
+	public List<Todo> deleteByUser(User user){
+		return todoRepository.deleteByUser(user);
 	}
 	
 	public Todo save(TodoCreateDto createDto) throws javassist.NotFoundException {
@@ -49,11 +54,12 @@ public class TodoService {
 		return todo;
 	}
 	
+	
 	private Todo buildTodoFromDto(TodoCreateDto createDto) throws javassist.NotFoundException {
 		Todo todo = new Todo();
 		
 		todo.setDescription(createDto.getDescription());
-		User user = userService.findById(createDto.getUserId());
+		User user = userRepository.findById(createDto.getUserId()).orElseThrow(() -> new NotFoundException("Nije pronađen korisnik! (id:"+createDto.getUserId()+")"));
 		todo.setUser(user);
 		return todo;
 	}

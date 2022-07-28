@@ -1,6 +1,7 @@
 package com.lanaco.todo.model;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -44,6 +45,4 @@ public class Todo {
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
-	
-
 }
